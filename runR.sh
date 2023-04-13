@@ -29,9 +29,8 @@ module load anaconda/3
 
 GPUS=1
 echo "Number of GPUs: "${GPUS}
-WRAP="python train2.py args.config=configs/custom_amna.yaml"
-#WRAP='python test2.py'
-JOBNAME="correction_ecosys"
+WRAP="Rscript rscript.R"
+JOBNAME="Rscript"
 LOG_FOLDER="/home/mila/a/amna.elmustafa/ecosys_logs"
 echo ${WRAP}
 echo "Log Folder:"${LOG_FOLDER}
@@ -49,7 +48,7 @@ Slurm Environment Variables:
 # slurm doesn't source .bashrc automatically
 source ~/.bashrc
 
-project_dir="/network/scratch/a/amna.elmustafa/final/ecosystem-embedding"
+project_dir="/network/scratch/a/amna.elmustafa/tmp2/ecosystem-embedding"
 echo "Setting directory to: $project_dir"
 cd $project_dir
 
@@ -61,16 +60,17 @@ Basic system information:
 - User: $USER
 - pwd: $(pwd)
 "
-conda activate ebird
+conda activate Renv
 
 #{content}
 
 export CUDA_VISIBLE_DEVICES=0,1
-export COMET_API_KEY="9PY4gOZFYKFRPw5xSCtDpdM7H"
-export COMET_WORKSPACE="amnaalmgly"
+# export COMET_API_KEY="9PY4gOZFYKFRPw5xSCtDpdM7H"
+# export COMET_WORKSPACE="amnaalmgly"
+export EBIRDST_DATA_DIR="/network/scratch/a/amna.elmustafa/tmp2/ecosystem-embedding"
 
 sbatch --output=${LOG_FOLDER}/%j.out --error=${LOG_FOLDER}/%j.err \
-    --nodes=1 --ntasks-per-node=1 --time=2-00:00:00 --mem=20G \
+    --nodes=1 --ntasks-per-node=1 --time=2-00:00:00 --mem=30G \
     --partition=long --cpus-per-task=4 \
     --gres=gpu:${GPUS} --job-name=${JOBNAME} --wrap="${WRAP}"
 

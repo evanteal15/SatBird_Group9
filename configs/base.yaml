@@ -1,29 +1,22 @@
 #where to save checkpoints
-save_path: "/network/scratch/a/amna.elmustafa/ecosystem-embeddings/ckpts"
+save_path: "/network/scratch/t/tengmeli/ecosystem-embeddings/checkpoint_base_resnet18_allspecies"
 
 #load existing checkpoint for inference
-load_ckpt_path: ''
-#"/network/projects/_groups/ecosystem-embeddings/ebird_checkpoints/resnet18_location_300_epochs/epoch=299-step=14099.ckpt"
-
-#~/ecosystem-embedding/outputs/2022-05-26/12-16-51/range_maps/f0314641a3d447ad9699e962088f0e11/checkpoints/epoch=307-step=14475.ckpt" #"~/ecosystem-embedding/outputs/2022-05-26/12-18-20/range_maps/1ace46dd62cc4d6eb9b532b59ac6643a/checkpoints/epoch=341-step=16073.ckpt" #"~/ecosystem-embedding/outputs/2022-05-26/12-16-51/range_maps/f0314641a3d447ad9699e962088f0e11/checkpoints/epoch=307-step=14475.ckpt"
-save_preds_path: ""
-#"/network/projects/_groups/ecosystem-embeddings/ebird_checkpoints/resnet18_location_300_epochs/preds"
-log_comet: True
+load_ckpt_path: "" 
+save_preds_path: "/network/projects/_groups/ecosystem-embeddings/ebird_checkpoints/resnet18_base_allspecies_pretrained_init_res64/preds"
+log_comet: true
 
 overfit_batches: 0.0
-#use geographical informationf
+#use geographical information
 loc:
-  use: false
+  use: False
   #if True :concatenate location features with satellite image features, else location features are mappe to same imension as satellite features and the features are multiplie
   loc_type: "latlon"   #latlon or state
   concat: True
   
 comet:
-  project_name: "range_maps" #"ecosystem-duck"
-
-  tags: ["resnet18", "rgb_nir", "adam","range maps","feature map multires,padding","landuse sat"]
-  #"R range_maps"]
-
+  project_name: "clean_baselines" #"ecosystem-duck"
+  tags: ["resnet18",  "rgb_nir","bioped", "pretrained"]
 
 experiment:
   #TASK and name should always be ebird_classifier --> maybe remove it 
@@ -37,23 +30,20 @@ experiment:
     #"linear" or "linear_net" for a 2 layer MLP
     fc: "linear"
     #use pretraine weights ( trochvision ) 
-    pretrained: true
-    resum: ""
-    resume:  ""
-    #"/network/scratch/a/amna.elmustafa/final/ecosystem-embedding/moco_geo+tp.pth.tar"
-    #"/network/scratch/a/amna.elmustafa/seco_resnet18_100k.ckpt" #"/home/mila/t/tengmeli/ecosystem-embedding/outputs/2022-03-29/08-40-05/final_layer_comparison/b84c264fb4c8477f95cad55bbf85d709/checkpoints/epoch=1273-step=408953.ckpt"
+    pretrained: True
+    resume: "" #"/home/mila/t/tengmeli/ecosystem-embedding/outputs/2022-03-29/08-40-05/final_layer_comparison/b84c264fb4c8477f95cad55bbf85d709/checkpoints/epoch=1273-step=408953.ckpt"
     
     #initializes biases of the output layer sothat sigmoid(bias) = mean over the training set for each species
     init_bias: ""
     means_path: "/network/scratch/t/tengmeli/scratch/ecosystem-embedding/training/means_all_species.npy"
-    lr: 0.003
+    lr: 0.0003
 
 optimizer: "Adam"  #"Adam"
 
 #auto lr will only work if there is only one optimizer 
-auto_lr_find: false
+auto_lr_find: True
 scheduler: 
-  name: "WarmUp" #"" for no schuler, "ReduceLROnPlateau" #"ReduceLROnPlateau" or "StepLR" "WarmUp"
+  name: "ReduceLROnPlateau" #"" for no schuler, "ReduceLROnPlateau" #"ReduceLROnPlateau" or "StepLR" "WarmUp"
   reduce_lr_plateau: 
     factor: 0.5
     lr_schedule_patience: 20
@@ -89,19 +79,16 @@ data:
     batch_size: 64
   #What kind of satellite input ? "refl" for "raw" reflectance values or 
   #"img" for 0-255 values (only supported for "rgb" and "nir" bands)
-  datatype: "refl" 
+  datatype: "refl"
+  multiscale : [64]
   
-  bands:  ["r","g","b", "nir","landuse"] #["r","g","b", "nir"]
-  #['landuse']
-  #["r","g","b", "nir",'landuse']  #any subset of ["r", "g", "b", "nir","landuse"] if working with "refl" data or ["rgb", "nir"] if using "img" 
+  bands: ["r","g","b", "nir"]  #any subset of ["r", "g", "b", "nir"] if working with "refl" data or ["rgb", "nir"] if using "img" 
   
   res: 10 #resolution of the images
 
   #o you want to use environmental data (pedological and bioclimatic (low res) data)
-  env: []  # ["ped", "bioclim"] #  #["ped", "bioclim"] #ped" or "bioclim" or both or empty list
-  multiscale : [512,224]
-  multiscale_bands: ['landuse','sats']    #choices: [landuse ,sat]
-  multiscale_agg: 'features'    #choices [features, vectors]
+  env: ["ped", "bioclim"] #["ped", "bioclim"] #ped" or "bioclim" or both or empty list
+  
   #resolution of pedological and bioclimatic data in meters
   ped: 
       #pedological rasters
@@ -114,35 +101,37 @@ data:
     base: "/network/scratch/t/tengmeli/scratch/ecosystem-embedding/training/"
     train: "train_clustered_vf.csv"
     val: "valid_clustered_vf.csv"
-    test: "test_clustered_vf.csv"
+    test: "valid_clustered_vf.csv"
     correction: "/network/scratch/t/tengmeli/scratch/ecosystem-embedding/training/correction_factor_final.pkl" #soft thresholding file 
-    correction_thresh: '/network/scratch/t/tengmeli/scratch/ecosystem-embedding/training/final_range_map3.pkl'
     
-    #'/network/scratch/a/amna.elmustafa/tmp/ecosystem-embedding/data_processing/Htest4.npy'  #hard thresholding file ,options:[Htest, Htest2,Htest3,Htest4] corrosponding to threshold as [mean species values , mask of species that have prob less than mean ,mask of species that have prob less than mean/10 ,mask of species that have prob less than mean*10 ]
+    correction_thresh: '/network/scratch/t/tengmeli/scratch/ecosystem-embedding/training/final_range_map3.pkl'
+    #correction_thresh: #'/network/scratch/a/amna.elmustafa/tmp/ecosystem-embedding/data_processing/Htest4.npy'  #hard thresholding file ,options:[Htest, Htest2,Htest3,Htest4] corrosponding to threshold as [mean species values , mask of species that have prob less than mean ,mask of species that have prob less than mean/10 ,mask of species that have prob less than mean*10 ]
   correction_factor:
-     use:  None  #soft thresholding choises [None, 'before' (before sigmoid) ,'after'(after sigmoid)] 
-     thresh : 'after'  #hard thresholding ['before','after']
+     use: #soft thresholding choises [None, 'before' (before sigmoid) ,'after'(after sigmoid)] 
+     #hard thresholding
+     thresh: false
+
 
     
   target:
     type: "probs"  #binary for classification targets  or "probs" for regression (default should be "probs")
     
     # choose subset of birds : "ducks" for trying on species [37] or [2] for cooper's hawk (non passerine) "songbirds" (307 species) or None (full set 684 species) "not_songbirds"
-    subset: "not_songbirds"
+    subset: 
  
   #normalization: None
   transforms:
     - name: matchres
-      ignore: true
-      target_size: [224, 224]
+      ignore: False
+      target_size: [64, 64]
       
     - name: crop
       ignore: false
       p: 1
-      ignore_band: ["bioclim", "ped"] #["bioclim", "ped"]
+      ignore_band:  ["bioclim", "ped"] #["bioclim", "ped"]
       center: true # disable randomness, crop around the image's center
-      height: 224
-      width: 224
+      height: 64
+      width: 64
     - name: resize
       ignore: false
       size: [224,224]
@@ -153,7 +142,7 @@ data:
       ignore: "val"
       p: 0.5
     - name: normalize
-      ignore: false
+      ignore: False
       maxchan: false
       subset: ["sat"]
       custom: [[894.6719, 932.5726,693.2768, 2817.9849], [883.9763,747.6857,749.3098, 1342.6334]]
@@ -167,12 +156,12 @@ data:
       #[87.0467011965099, 91.21045367500467, 67.50251448722302],[67.55043009747773, 51.443316800384295, 49.65159018638426]
 
     - name: normalize
-      ignore: true
+      ignore: false
       maxchan: false
       subset: ["bioclim"]
       custom: [*bioclim_means, *bioclim_std]
     - name: normalize
-      ignore: true
+      ignore: false
       maxchan: false
       subset: ["ped"]
       custom: [*ped_means, *ped_std]
