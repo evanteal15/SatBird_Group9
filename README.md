@@ -2,7 +2,7 @@
 
 This repository provides the code required to create the dataset and reproduce the benchmark of:
 
-M. Teng, A. Elmustafa, B. Akera, Y. Bengio, H. Abdelwahed, H. Larochelle and D. Rolnick. ["SatBird: a Dataset for Bird Species Distribution Modeling using Remote Sensing and Citizen Science Data"](), *NeurIPS 2023 Datasets and Benchmarks track*
+M. Teng, A. Elmustafa, B. Akera, Y. Bengio, H. R. Abdelwahed, H. Larochelle and D. Rolnick. ["SatBird: a Dataset for Bird Species Distribution Modeling using Remote Sensing and Citizen Science Data"](https://proceedings.neurips.cc/paper_files/paper/2023/file/ef7653bbc4655305efb89a32362e332a-Paper-Datasets_and_Benchmarks.pdf), *NeurIPS 2023 Datasets and Benchmarks track*
 
 You can also visit the project's website [here](https://satbird.github.io/).
 
@@ -105,6 +105,20 @@ NaN values in the rasters are filled with bilinear interpolation when possible u
 **Dataset splits**
 Use `data_processing/utils/make_splits_by_distance.py` to your dataset and reduce spatial autocorrelation, compared to random splitting. 
 
+**How to cite**
+```
+@inproceedings{NEURIPS2023_ef7653bb,
+ author = {Teng, M\'{e}lisande and Elmustafa, Amna and Akera, Benjamin and Bengio, Yoshua and Radi, Hager and Larochelle, Hugo and Rolnick, David},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {A. Oh and T. Neumann and A. Globerson and K. Saenko and M. Hardt and S. Levine},
+ pages = {75925--75950},
+ publisher = {Curran Associates, Inc.},
+ title = {SatBird: a Dataset for Bird Species Distribution Modeling using Remote Sensing and Citizen Science Data},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2023/file/ef7653bbc4655305efb89a32362e332a-Paper-Datasets_and_Benchmarks.pdf},
+ volume = {36},
+ year = {2023}
+}
+```
 
 This work is licensed under a
 [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) License](https://creativecommons.org/licenses/by-nc/4.0/).
