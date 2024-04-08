@@ -1,5 +1,8 @@
 # SatBird Dataset and Benchmarks
 
+April 8th, 2024: We have uploaded a corrected version of the Kenya dataset, fixing some satellite images from the first release. The dataset now comprises 9763 locations which were all present in the previous release. 
+
+
 This repository provides the code required to create the dataset and reproduce the benchmark of:
 
 M. Teng, A. Elmustafa, B. Akera, Y. Bengio, H. R. Abdelwahed, H. Larochelle and D. Rolnick. ["SatBird: a Dataset for Bird Species Distribution Modeling using Remote Sensing and Citizen Science Data"](https://proceedings.neurips.cc/paper_files/paper/2023/file/ef7653bbc4655305efb89a32362e332a-Paper-Datasets_and_Benchmarks.pdf), *NeurIPS 2023 Datasets and Benchmarks track*
