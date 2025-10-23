@@ -15,7 +15,7 @@ base_dir:
 loc:
   use: False
   #if True :concatenate location features with satellite image features, else location features are mappe to same imension as satellite features and the features are multiplie
-  loc_type: "latlon"   #latlon or state
+  loc_type: "latlon" #latlon or state
   concat: True
 
 comet:
@@ -45,10 +45,10 @@ experiment:
     use_weighted_loss: True
     loss_weight: "nchklists"
 
-optimizer: "Adam"  #"Adam"
+optimizer: "Adam" #"Adam"
 
 losses:
-#scale attribute is just for plotting if the values are very small
+  #scale attribute is just for plotting if the values are very small
   criterion: "CE" #or MAE or MSE or Focal or RMSLE  (loss to choose for optim )
 
 #auto lr will only work if there is only one optimizer
@@ -69,16 +69,16 @@ scheduler:
     warmup_epochs: 10
 
 variables: &default_vars
-    ped_means: &ped_means []
-    ped_std: &ped_std []
-    bioclim_means: &bioclim_means []
-    bioclim_std: &bioclim_std []
+  ped_means: &ped_means []
+  ped_std: &ped_std []
+  bioclim_means: &bioclim_means []
+  bioclim_std: &bioclim_std []
 
-    rgbnir_means: &rgbnir_means []
-    rgbnir_std: &rgbnir_std []
+  rgbnir_means: &rgbnir_means []
+  rgbnir_std: &rgbnir_std []
 
-    visual_means: &visual_means []
-    visual_stds: &visual_stds []
+  visual_means: &visual_means []
+  visual_stds: &visual_stds []
 
 data:
   loaders:
@@ -87,9 +87,9 @@ data:
   #What kind of satellite input ? "refl" for "raw" reflectance values or
   #"img" for 0-255 values (only supported for "rgb" and "nir" bands)
   datatype: "refl"
-  multiscale : [64]
+  multiscale: [64]
 
-  bands: ["r","g","b", "nir"]  #any subset of ["r", "g", "b", "nir"] if working with "refl" data or ["rgb", "nir"] if using "img"
+  bands: ["r", "g", "b", "nir"] #any subset of ["r", "g", "b", "nir"] if working with "refl" data or ["rgb", "nir"] if using "img"
 
   res: 10 #resolution of the images
 
@@ -99,11 +99,11 @@ data:
 
   #resolution of pedological and bioclimatic data in meters
   ped:
-      #pedological rasters
-      res: 250
+    #pedological rasters
+    res: 250
   bioclim:
-      #bioclim
-      res: 1000
+    #bioclim
+    res: 1000
 
   files:
     base: "/network/projects/ecosystem-embeddings/SatBird_data_v2/Kenya"
@@ -126,10 +126,10 @@ data:
     env_stds: "stats/env_stds.npy"
 
   correction_factor:
-     thresh: # to train with RM
+    thresh: # to train with RM
 
   target:
-    type: "probs"  #binary for classification targets  or "probs" for regression (default should be "probs")
+    type: "probs" #binary for classification targets  or "probs" for regression (default should be "probs")
 
     # choose subset of birds : "ducks" for trying on species [37] or [2] for cooper's hawk (non passerine) "songbirds" (307 species) or None (full set 684 species) "not_songbirds"
     subset:
