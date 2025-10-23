@@ -31,8 +31,8 @@ SBATCH --mail-type=BEGIN,END
 # Load Python and any other desired modules module load python/3.12.1
 # Specify the script you want to run
 
-module load miniconda/3
-conda activate eco
+# module load miniconda/3
+# conda activate eco
 # export COMET_API_KEY=$COMET_API_KEY
-export HYDRA_FULL_ERROR=1
+# export HYDRA_FULL_ERROR=1
 python train.py  ++auto_lr_find="False" args.config=configs/SatBired-Kenya/resnet18.yaml args.run_id=1
