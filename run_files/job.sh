@@ -11,9 +11,9 @@
 #!/bin/bash # The interpreter used to execute the script
 # Lines beginning with #SBATCH specify your computing resources and other logistics about how to run your job.
 #Access computing resources allocated to the MLRE course account,the section may be 006 or 007 depending on the student.
-SBATCH --account=eecs498f25s006_class
+SBATCH --account=eecs498f25s007_class
 # Specify the maximum runtime (in Hours:Minutes:Seconds). If your job hits that runtime, it will be terminated.
-SBATCH --time=8:00
+SBATCH --time=7:00
 # Specify whether to use a GPU (partition=gpu) or CPU (partition=standard). If you use the GPU partition, only request one
 #GPU (gpus=1). Note that if you use the standard partition, you may
 #have to remove the gpu configuration.
