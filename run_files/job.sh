@@ -12,4 +12,4 @@ module load miniconda/3
 conda activate eco
 export COMET_API_KEY=$COMET_API_KEY
 export HYDRA_FULL_ERROR=1
-python train.py  ++auto_lr_find="False" args.config=configs/base.yaml args.run_id=1
+python train.py  ++auto_lr_find="False" args.config=configs/SatBired-Kenya/resnet18.yaml args.run_id=1
