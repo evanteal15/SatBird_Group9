@@ -1,0 +1,131 @@
+
+# HYDRA CONFIG
+
+#defaults:
+#   - defaults
+
+args:
+  config: null # "What configuration file to use to overwrite shared/defaults.yaml"
+  base_dir: ""
+  run_id: 1
+  note: null # Note about this training for comet logging
+  no_comet: False # DON'T use comet.ml to log experiment
+  resume: False # Load latest ckpt
+  tags: null
+  dev: False # Run this script in development mode
+  num_species: 670
+
+program: # These are the arguments that define how the train.py script works
+  seed: 1337
+  output_dir: output
+  data_dir: data
+  log_dir: logs
+  overwrite: False
+
+data:
+  loaders:
+    num_workers: 4
+    batch_size: 8
+  files:
+    base: "SatBird_data_complete"
+    train: "train.csv"
+    val: "val.csv"
+    test: "test.csv"
+
+    targets_folder: ""
+    env_data_folder: ""
+    images_folder: ""
+  
+  total_species: 670
+  datatype: "img"
+
+losses:
+  criterion: "MAE" #or MAE or MSE  (loss to choosefor optim )
+  ce:
+    ignore: False
+      #weights on the cross entropy
+    lambd_pres: 1
+    lambd_abs: 1
+  metrics:
+    - name: ce
+      ignore: True
+      #weights on the cross entropy
+      lambd_pres: 1
+      lambd_abs: 1
+      scale : 1
+    - name: mae
+      ignore: False
+      scale: 10
+    - name: mse
+      ignore: False
+      scale: 10
+    - name: topk
+      ignore: False
+      scale: 1
+    - name: r2
+      ignore: True #False
+      scale: 1
+    - name: kl
+      ignore: False
+      scale : 1
+    - name: accuracy
+      ignore: True
+      scale: 1
+    - name: top10
+      ignore: False
+      scale: 1
+    - name: top30
+      ignore: False
+      scale: 1
+
+trainer: # These are the parameters passed to the pytorch lightning Trainer object
+  logger: True
+  checkpoint_callback: True
+  callbacks: null
+  default_root_dir: null
+  gradient_clip_val: 0.0
+  process_position: 0
+  num_nodes: 1
+  num_processes: 1
+  gpus: 1
+  auto_select_gpus: False
+  tpu_cores: null
+  log_gpu_memory: null
+  progress_bar_refresh_rate: null
+  overfit_batches: 0.0
+  track_grad_norm: -1
+  check_val_every_n_epoch: 1
+  fast_dev_run: False
+  accumulate_grad_batches: 1
+  max_epochs: 400
+  min_epochs: null
+  max_steps: null
+  min_steps: null
+  limit_train_batches: 1.0
+  limit_val_batches: 1.0
+  limit_test_batches: 1.0
+  val_check_interval: 1.0
+  flush_logs_every_n_steps: 100
+  log_every_n_steps: 1
+  accelerator: null
+  sync_batchnorm: False
+  precision: 32 #32
+  weights_summary: "top"
+  weights_save_path: null
+  num_sanity_val_steps: 2
+  resume_from_checkpoint: null
+  profiler: null
+  benchmark: False
+  deterministic: False
+  reload_dataloaders_every_epoch: False
+  auto_lr_find: False
+  replace_sampler_ddp: True
+  terminate_on_nan: False
+  auto_scale_batch_size: True
+  prepare_data_per_node: True
+  plugins: null
+  amp_backend: "native"
+  move_metrics_to_cpu: False
+
+save_preds_path: ""
+base_dir: "extension_output"

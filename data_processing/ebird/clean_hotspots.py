@@ -5,10 +5,16 @@ from pathlib import Path
 import os, numpy, json, tifffile
 
 def filter_by_sat():
-    summer = pd.read_csv("/network/projects/ecosystem-embeddings/ebird_new/summer_hotspots_with_bioclim_splits_vf_clean.csv")
-    hotspots = [r.strip(".tif") for r in os.listdir("/network/projects/_groups/ecosystem-embeddings/ebird_new/rasters_new/summer_rasters/")]
+    summer = pd.read_csv("./SatBird_data_complete/all_hotspots_syncd.csv")
+    hotspots = [r.strip(".tif") for r in os.listdir("./SatBird_data_v3/summer_rasters2022/")]
+    hotspots1 = [r.strip(".tif") for r in os.listdir("./SatBird_data_v3/summer_rasters2023/")]
+    hotspots2 = [r.strip(".tif") for r in os.listdir("./SatBird_data_v3/summer_rasters2024/")]
+    hotspots3 = [r.strip(".tif") for r in os.listdir("./SatBird_data_v3/summer_rasters2025/")]
     uu = summer[summer["hotspot_id"].isin(hotspots)]
-    uu.drop(columns = ["Unnamed: 0"]).to_csv("/network/projects/ecosystem-embeddings/ebird_new/summer_hotspots_with_bioclim_splits_final.csv")
+    uu = uu[uu["hotspot_id"].isin(hotspots1)]
+    uu = uu[uu["hotspot_id"].isin(hotspots2)]
+    uu = uu[uu["hotspot_id"].isin(hotspots3)]
+    uu.drop(columns = ["Unnamed: 0"], errors='ignore').to_csv("./SatBird_data_complete/all_hotspots_cleaned.csv")
 
 def filter_by_geography():
     root = Path("/network/projects/ecosystem-embeddings/ebird_new/")
@@ -23,19 +29,19 @@ def filter_by_geography():
     summer_clean.to_csv(root / "summer_hotspots_final.csv")
 
 def filter_by_size():
-    df = pd.read_csv("/network/projects/ecosystem-embeddings/ebird_new/summer_hotspots_final.csv")
+    df = pd.read_csv("./SatBird_data_v3/summer_hotspots_final.csv")
     indices = []
     for i, elem in enumerate(df.hotspot_id.values):
-        w,h,b = tifffile.imread(f"/network/projects/_groups/ecosystem-embeddings/ebird_new/rasters_new/summer_rasters/{elem}.tif").shape
+        w,h,b = tifffile.imread(f"./SatBird_data_v3/summer_rasters2022/{elem}.tif").shape
         if w<128 or h<128:
             indices += [i]
-    df = df.drop(columns = ["Unnamed: 0.1",'Unnamed: 0'])
+    df = df.drop(columns = ["Unnamed: 0.1",'Unnamed: 0'], errors='ignore')
     df = df.drop(indices)
     print(len(indices))
     print(len(df))
-    df.to_csv("/network/projects/ecosystem-embeddings/ebird_new/summer_hotspots_clean.csv")
+    df.to_csv("./SatBird_data_v3/summer_hotspots_clean.csv")
     
 if __name__=="__main__":
-    #filter_by_sat()
+    filter_by_sat()
     #filter_by_geography()
-    filter_by_size()
+    #filter_by_size()

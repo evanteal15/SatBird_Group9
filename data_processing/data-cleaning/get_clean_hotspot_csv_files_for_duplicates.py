@@ -9,10 +9,10 @@ def remove_row_duplicates(mypath, output_csv_folder, onlyfiles):
     """
     for idx, file in enumerate(onlyfiles):
         # Absolute path of pre-processed csv file
-        csv_path = mypath + file
+        csv_path = mypath + "/" +  file
 
         # Absolute path of post-processed csv file
-        output_path = output_csv_folder + file
+        output_path = output_csv_folder + "/" + file
 
         # Convert csv to dataframe
         single_csv_df = pd.read_csv(csv_path, delimiter=",")
@@ -21,9 +21,9 @@ def remove_row_duplicates(mypath, output_csv_folder, onlyfiles):
         no_duplicates = single_csv_df.drop_duplicates()
 
         # One single row is still same as header (because its unique row). Remove it
-        single_csv_cleaned_df = no_duplicates.loc[no_duplicates['GLOBAL UNIQUE IDENTIFIER']!='GLOBAL UNIQUE IDENTIFIER']
+        # single_csv_cleaned_df = no_duplicates.loc[no_duplicates['GLOBAL UNIQUE IDENTIFIER']!='GLOBAL UNIQUE IDENTIFIER']
 
-        single_csv_cleaned_df.to_csv(output_path, index = False)
+        no_duplicates.to_csv(output_path, index = False)
 
         if (idx % 100 == 0):
             print("#", end ='')
@@ -31,8 +31,8 @@ def remove_row_duplicates(mypath, output_csv_folder, onlyfiles):
     
 def main():
     # Path of all individual CSV files for each hotspot
-    src_csv_folder = ''
-    dest_csv_folder = ''
+    src_csv_folder = 'SatBird_data_v3'
+    dest_csv_folder = 'SatBird_data_v3'
 
     # List of all such csv files
     onlyfiles = [f for f in listdir(src_csv_folder) if isfile(join(src_csv_folder, f))]

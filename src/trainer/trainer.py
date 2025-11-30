@@ -71,52 +71,80 @@ class EbirdTask(pl.LightningModule):
         self.model = self.get_sat_model()
 
     def get_sat_model(self):
-        if self.opts.experiment.module.model == "satlas":
-            print('using Satlas model')
-            # first lets assume freezing the pretrained model
+        module_cfg = self.opts.experiment.module
+        resume_path = module_cfg.resume
+        pretrained_flag = getattr(module_cfg, "pretrained", False)
+
+        # ===== SATLAS =====
+        if module_cfg.model == "satlas":
+            print("Using Satlas model")
+
+            # Base model definition
             self.feature_extractor = torchvision.models.swin_transformer.swin_v2_b()
-            # self.opts.experiment.module.resume should be path to satlas model (we used satlas-model-v1-lowres.pth)
-            full_state_dict = torch.load(self.opts.experiment.module.resume, map_location=torch.device('cpu'))
-            swin_prefix = 'backbone.backbone.'
-            swin_state_dict = {k[len(swin_prefix):]: v for k, v in full_state_dict.items() if k.startswith(swin_prefix)}
 
-            self.feature_extractor.load_state_dict(swin_state_dict)
-            self.feature_extractor.to('cuda:0')
-            print("initialized network, freezing weights")
+            # Only try loading checkpoint if resume path is valid and pretrained is True
+            if resume_path and str(resume_path).lower() != "none" and pretrained_flag:
+                print(f"Loading Satlas checkpoint from: {resume_path}")
+                try:
+                    full_state_dict = torch.load(resume_path, map_location=torch.device("cpu"))
+                    swin_prefix = "backbone.backbone."
+                    swin_state_dict = {
+                        k[len(swin_prefix):]: v for k, v in full_state_dict.items() if k.startswith(swin_prefix)
+                    }
+                    self.feature_extractor.load_state_dict(swin_state_dict, strict=False)
+                    print("Loaded pretrained Satlas weights successfully.")
+                except Exception as e:
+                    print(f"⚠️ Warning: Could not load Satlas checkpoint from {resume_path}: {e}")
+                    print("Continuing with random initialization instead.")
+            else:
+                print("No Satlas checkpoint provided or pretrained=False — starting from scratch.")
 
+            self.feature_extractor.to("cuda:0")
+            print("Initialized Satlas network, freezing weights.")
             for param in self.feature_extractor.parameters():
                 param.requires_grad = False
             self.model = nn.Linear(1000, self.target_size)
 
-        elif self.opts.experiment.module.model == "satmae":
-            print('using SatMAE model')
-            satmae = ViTFinetune(img_size=224, patch_size=16, in_chans=3, num_classes=self.target_size, embed_dim=1024,
-                                 depth=24, num_heads=16, mlp_ratio=4, drop_rate=0.1, )
-            # self.opts.experiment.module.resume should be set to fMoW pretrained SatMAE model
-            satmae = load_from_checkpoint(self.opts.experiment.module.resume, satmae)
-            satmae.to('cuda')
+        # ===== SATMAE =====
+        elif module_cfg.model == "satmae":
+            print("Using SatMAE model")
+
+            satmae = ViTFinetune(
+                img_size=224, patch_size=16, in_chans=3,
+                num_classes=self.target_size, embed_dim=1024,
+                depth=24, num_heads=16, mlp_ratio=4, drop_rate=0.1
+            )
+
+            # Only load checkpoint if resume path is valid and pretrained=True
+            if resume_path and str(resume_path).lower() != "none" and pretrained_flag:
+                print(f"Loading SatMAE pretrained weights from: {resume_path}")
+                try:
+                    satmae = load_from_checkpoint(resume_path, satmae)
+                    print("Loaded SatMAE pretrained weights successfully.")
+                except Exception as e:
+                    print(f"⚠️ Warning: Could not load SatMAE checkpoint from {resume_path}: {e}")
+                    print("Continuing with random initialization instead.")
+            else:
+                print("No SatMAE checkpoint provided or pretrained=False — starting from scratch.")
+
+            satmae.to("cuda")
             in_feat = satmae.fc.in_features
             satmae.fc = nn.Sequential()
-            print("initialized network, freezing weights")
+            print("Initialized SatMAE network, freezing weights.")
             self.feature_extractor = satmae
             for param in self.feature_extractor.parameters():
                 param.requires_grad = False
             self.model = nn.Linear(in_feat, self.target_size)
 
-        elif self.opts.experiment.module.model == "resnet18":
+        # ===== RESNET18 =====
+        elif module_cfg.model == "resnet18":
+            self.model = models.resnet18(pretrained=pretrained_flag)
 
-            self.model = models.resnet18(pretrained=self.opts.experiment.module.pretrained)
-
-            if self.opts.experiment.module.transfer_weights == "SECO":
-                # this works for https://zenodo.org/record/4728033/files/seco_resnet18_1m.ckpt?download=1
-                # Seco ResNet-18-1M model - from which the state dict corresponding only to the ResNet18 part encoder was extracted.
-                # because of some package version compatibility issues, we saved the encoder weights of the Seco ResNet-18-1M model as pkl 
-                # and that is what is supported in this code. 
+            if module_cfg.transfer_weights == "SECO":
                 print("Initializing with SeCo weights")
-                with open(self.opts.experiment.module.resume, "rb") as file:
+                with open(resume_path, "rb") as file:
                     enc = pickle.load(file)
                 pretrained = list(enc.items())
-                # match the weights
                 model_dict = dict(self.model.state_dict())
                 count = 0
                 for key, value in model_dict.items():
@@ -130,63 +158,53 @@ class EbirdTask(pl.LightningModule):
                 self.bands = self.opts.data.bands + self.opts.data.env
                 orig_channels = self.model.conv1.in_channels
                 weights = self.model.conv1.weight.data.clone()
-                self.model.conv1 = nn.Conv2d(get_nb_bands(self.bands), 64, kernel_size=(7, 7), stride=(2, 2),
-                                             padding=(3, 3), bias=False, )
-                # assume first three channels are rgb
-                if self.opts.experiment.module.pretrained:
-                    # self.model.conv1.weight.data[:, :orig_channels, :, :] = weights
+                self.model.conv1 = nn.Conv2d(
+                    get_nb_bands(self.bands), 64, kernel_size=(7, 7),
+                    stride=(2, 2), padding=(3, 3), bias=False
+                )
+                if pretrained_flag:
                     self.model.conv1.weight.data = init_first_layer_weights(get_nb_bands(self.bands), weights)
 
-            if self.opts.experiment.module.transfer_weights == "USA":
-
-                # this is used for transferring USA weights to Kenya
+            if module_cfg.transfer_weights == "USA":
                 print("Transferring USA weights")
-
-                ckpt = torch.load(self.opts.experiment.module.resume)
+                ckpt = torch.load(resume_path)
                 self.model.fc = nn.Sequential()
-                loaded_dict = ckpt['state_dict']
+                loaded_dict = ckpt["state_dict"]
                 model_dict = self.model.state_dict()
-
-                # load state dict keys
                 for key_model, key_pretrained in zip(model_dict.keys(), loaded_dict.keys()):
-                    # ignore first layer weights(use imagenet ones)
-                    if key_model == 'conv1.weight':
+                    if key_model == "conv1.weight":
                         continue
                     model_dict[key_model] = loaded_dict[key_pretrained]
-
                 self.model.load_state_dict(model_dict)
-
                 if self.freeze_backbone:
-                    print("initialized network, freezing weights")
+                    print("Initialized network, freezing weights.")
                     for param in self.model.parameters():
                         param.requires_grad = False
 
             self.model.fc = nn.Linear(512, self.target_size)
 
-
         else:
-            raise ValueError(f"Model type '{self.opts.experiment.module.model}' is not valid")
+            raise ValueError(f"Model type '{module_cfg.model}' is not valid")
 
-        if self.opts.experiment.module.init_bias == "means":
-            print("initializing biases with mean predictor")
-            self.means = np.load(self.opts.experiment.module.means_path)[0, self.subset]
+        # ===== Mean bias initialization =====
+        if module_cfg.init_bias == "means":
+            print("Initializing biases with mean predictor")
+            self.means = np.load(module_cfg.means_path)[0, self.subset]
             means = torch.Tensor(self.means)
-
             means = torch.logit(means, eps=1e-10)
             self.model.fc.bias.data = means
 
+        # ===== Metrics setup =====
         metrics = get_metrics(self.opts)
         for (name, value, _) in metrics:
             setattr(self, "val_" + name, value)
-        for (name, value, _) in metrics:
             setattr(self, "train_" + name, value)
-        for (name, value, _) in metrics:
             setattr(self, "test_" + name, value)
         self.metrics = metrics
 
-        # range maps
+        # ===== Range maps =====
         if self.opts.data.correction_factor.thresh:
-            with open(os.path.join(self.opts.data.files.base, self.opts.data.files.correction_thresh), 'rb') as f:
+            with open(os.path.join(self.opts.data.files.base, self.opts.data.files.correction_thresh), "rb") as f:
                 self.correction_t_data = pickle.load(f)
 
         return self.model
@@ -221,7 +239,7 @@ class EbirdTask(pl.LightningModule):
 
         if self.opts.data.correction_factor.thresh == 'after':
             # this means we are training with Range Maps
-            correction_t = (self.correction_t_data.reset_index().set_index('hotspot_id').drop(columns=["index"]).loc[
+            correction_t = (self.correction_t_data.reset_index().set_index('hotspot_id').drop(columns=["index"], errors="ignore").loc[
                 list(hotspot_id)]).iloc[:, self.subset].values
             correction_t = torch.tensor(correction_t, device=y.device)
             mask = correction_t
@@ -262,7 +280,7 @@ class EbirdTask(pl.LightningModule):
         hotspot_id = batch['hotspot_id']
 
         if self.opts.data.correction_factor.thresh:
-            correction_t = (self.correction_t_data.reset_index().set_index('hotspot_id').drop(columns=["index"]).loc[
+            correction_t = (self.correction_t_data.reset_index().set_index('hotspot_id').drop(columns=["index"], errors="ignore").loc[
                 list(hotspot_id)]).iloc[:, self.subset].values
             correction_t = torch.tensor(correction_t, device=y.device)
             self.correction = correction_t
@@ -310,7 +328,7 @@ class EbirdTask(pl.LightningModule):
 
         hotspot_id = batch['hotspot_id']
         if self.opts.data.correction_factor.thresh:
-            correction_t = (self.correction_t_data.reset_index().set_index('hotspot_id').drop(columns=["index"]).loc[
+            correction_t = (self.correction_t_data.reset_index().set_index('hotspot_id').drop(columns=["index"], errors="ignore").loc[
                 list(hotspot_id)]).iloc[:, self.subset].values
             correction_t = torch.tensor(correction_t, device=y.device)
 

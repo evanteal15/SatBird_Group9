@@ -1,0 +1,157 @@
+# =========================================
+# SatMAE RGB-only training configuration (Michigan)
+# Fully self-contained; no base.yaml required
+# =========================================
+
+save_path: "pretrained_weights"
+load_ckpt_path: ""
+save_preds_path: ""
+log_comet: false
+
+overfit_batches: 0.0
+max_epochs: 50
+base_dir: ""
+
+comet:
+  project_name: "camera_baselines"
+  tags: ["satmae", "summer", "rgb_only"]
+  experiment_name: "satmae_rgb_michigan"
+  experiment_key: ""
+
+experiment:
+  seed: 42
+  module:
+    model: "satmae"
+    fc: "linear"
+    pretrained: false
+    resume: null
+    freeze: false
+    init_bias: ""
+    means_path: ""
+    lr: 0.0003
+
+optimizer: "Adam"
+
+losses:
+  criterion: "CE"
+
+auto_lr_find: false
+scheduler:
+  name: "ReduceLROnPlateau"
+  reduce_lr_plateau:
+    factor: 0.5
+    lr_schedule_patience: 20
+
+# ---- Anchors (for transforms)
+variables: &default_vars
+  ped_means: &ped_means []
+  ped_std: &ped_std []
+  bioclim_means: &bioclim_means []
+  bioclim_std: &bioclim_std []
+  rgbnir_means: &rgbnir_means []
+  rgbnir_std: &rgbnir_std []
+  visual_means: &visual_means [0.485, 0.456, 0.406]
+  visual_stds: &visual_stds [0.229, 0.224, 0.225]
+
+# ---- Data configuration
+data:
+  loaders:
+    num_workers: 8
+    batch_size: 128
+
+  datatype: "img"      # image-based input (0-255 pixel values)
+  multiscale: [64]
+  bands: ["rgb"]
+  res: 10
+  env: []              # no environmental data for these baselines
+
+  ped:
+    res: 250
+  bioclim:
+    res: 1000
+
+  files:
+    base: "USA_summer_michigan"
+    train: "train_split.csv"
+    val: "valid_split.csv"
+    test: "test_split.csv"
+
+    targets_folder: "targets"
+    env_data_folder: "environmental"
+    images_folder: "images"
+
+    correction_thresh: ""  # disable range maps
+    rgb_means: "stats/means_images_visual.npy"
+    rgb_stds: "stats/stds_images_visual.npy"
+
+  correction_factor:
+    thresh:
+
+  target:
+    type: "probs"
+    subset:
+
+  transforms:
+    - name: crop
+      ignore: false
+      p: 1
+      center: true
+      height: 64
+      width: 64
+      ignore_band: []
+
+    - name: hflip
+      ignore: "val"
+      p: 0.5
+      ignore_band: []
+
+    - name: vflip
+      ignore: "val"
+      p: 0.5
+      ignore_band: []
+      
+    - name: resize
+      ignore: false
+      size: [224, 224]
+      ignore_band: []
+
+    - name: normalize
+      normalize_by_255: true
+      ignore: false
+      maxchan: false
+      subset: ["sat"]
+      custom: [*visual_means, *visual_stds]
+      ignore_band: []
+
+    - name: randomnoise
+      ignore: "val"
+      std: 0.01
+      max_noise: 0.05
+      p: 0.35
+      ignore_band: []
+
+    - name: blur
+      ignore: "val"
+      p: 0.5
+      val: 0.1
+      ignore_band: []
+
+    - name: rotate
+      ignore: "val"
+      p: 0.5
+      val: 15
+      ignore_band: []
+
+    - name: randomcontrast
+      ignore: "val"
+      p: 0.35
+      val: 2
+      ignore_band: []
+
+    - name: randombrightness
+      ignore: "val"
+      p: 0.3
+      val: 2
+      ignore_band: []
+
+  total_species: 670

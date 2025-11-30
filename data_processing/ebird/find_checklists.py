@@ -8,9 +8,9 @@ from pathlib import Path
 import pandas as pd
 from tqdm import tqdm
 
-SCRATCH = Path(os.environ["SCRATCH"])
-SLURM_TMPDIR = Path(os.environ["SLURM_TMPDIR"])
-TOTAL_LINES = 102602192
+SCRATCH = Path(os.environ.get("SCRATCH", "/tmp"))
+SLURM_TMPDIR = Path(os.environ.get("SLURM_TMPDIR", "/slurm_tmp"))
+TOTAL_LINES = 3230195
 
 # NOTE: Unused, but might be useful for debugging to see the column names and data types.
 nan = float("nan")
@@ -24,19 +24,19 @@ nan = float("nan")
 def process_chunk(chunk: pd.DataFrame):
     # No need to do that, since it's already part of the `read_csv` function.
     # chunk["OBSERVATION DATE"] = pd.to_datetime(chunk["OBSERVATION DATE"])
-    chunk = chunk[chunk["country"]== "United States"]
+    chunk = chunk[chunk["COUNTRY"]== "United States"]
     chunk = chunk[chunk["ALL SPECIES REPORTED"]==1]
     chunk = chunk[~chunk["STATE"].isin(["Alaska", "Hawaii"])]
     try:
-        chunk = chunk[chunk["OBSERVATION DATE"].dt.year >= 2010]
-        summer = chunk[chunk["OBSERVATION DATE"].dt.month.isin([6,7])]
+        chunk = chunk[(chunk["OBSERVATION DATE"].dt.year >= 2010) & (chunk["OBSERVATION DATE"].dt.year <= 2022)]
+        summer = chunk[chunk["OBSERVATION DATE"].dt.month.isin([6,7,8])]
         winter = chunk[chunk["OBSERVATION DATE"].dt.month.isin([12,1])]
         return summer, winter
-    except:
-        print(chunk["OBSERVATION DATE"])
+    except Exception as e:
+        print(f"Error in chuck processing: {e}")
         chunk["OBSERVATION DATE"] = pd.to_datetime(chunk["OBSERVATION DATE"])
-        chunk = chunk[chunk["OBSERVATION DATE"].dt.year >= 2010]
-        summer = chunk[chunk["OBSERVATION DATE"].dt.month.isin([6,7])]
+        chunk = chunk[(chunk["OBSERVATION DATE"].dt.year >= 2010) & (chunk["OBSERVATION DATE"].dt.year <= 2022)]
+        summer = chunk[chunk["OBSERVATION DATE"].dt.month.isin([6,7,8])]
         winter = chunk[chunk["OBSERVATION DATE"].dt.month.isin([12,1])]
         return summer, winter
     
@@ -54,8 +54,8 @@ def main():
     print("start task")
 
     # EBIRD DATA FILE LOCATION
-    data_path = "/network/projects/_groups/ecosystem-embeddings/ebird_new/ebd_sampling_relMar-2023.txt"
-    output_dir = Path("/network/projects/_groups/ecosystem-embeddings/ebird_new/checklists_USA")
+    data_path = "./EBD/ebd_US-MI_smp_relSep-2025_sampling.txt"
+    output_dir = Path("./checklists_USA10-22")
 
     # Might get even better results by tuning this parameter here, but this works fine for now.
     reader_chunk_size = 10000
@@ -80,12 +80,12 @@ def main():
         reader,
         unit="Lines",
         unit_scale=reader_chunk_size,
-        total=int(TOTAL_LINES / reader_chunk_size),  # number of chunks.
+        total=None,  # number of chunks.
     )
 
     with mp.Pool(processes=n_cpus) as pool:
-        for processed_chunk in pool.imap_unordered(process_chunk, chunks_iterator):
-            summer , winter = processed_chunk
+        for chunk in chunks_iterator:
+            summer , winter = process_chunk(chunk)
             if not os.path.isfile(output_dir / "summer.csv"):
                 summer.to_csv(output_dir / "summer.csv", index=False)
             else:

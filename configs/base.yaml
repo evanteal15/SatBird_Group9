@@ -1,10 +1,10 @@
 #where to save checkpoints
-save_path: ""
+save_path: "checkpoints"
 
 # load existing checkpoint for inference. If passing experiment folder instead (for multiple seeds), it will evaluate all of them.
 load_ckpt_path: ""
 save_preds_path: ""
-log_comet: true
+log_comet: false
 
 overfit_batches: 0.0
 # maximum number of epochs to train for
@@ -86,8 +86,8 @@ data:
   res: 10 #resolution of the images
 
   #o you want to use environmental data (pedological and bioclimatic (low res) data) #ped" or "bioclim" or both or empty list
-  env: []#["bioclim", "ped"]
-  env_var_sizes: [19, 8]
+  env: [] #["bioclim", "ped"]
+  env_var_sizes: [] #[19, 8]
 
   #resolution of pedological and bioclimatic data in meters
   ped:
@@ -98,7 +98,7 @@ data:
       res: 1000
 
   files:
-    base: "USA_summer"
+    base: "new_kenya2"
     train: "train_split.csv"
     val: "valid_split.csv"
     test: "test_split.csv"
@@ -129,7 +129,7 @@ data:
   #normalization: None
   transforms:
     - name: matchres
-      ignore: false
+      ignore: true
       subset: ["bioclim", "ped"]
       target_size: [64, 64]
       custom_means: [*bioclim_means, *ped_means]
@@ -156,7 +156,7 @@ data:
 
     - name: normalize
       normalize_by_255: False
-      ignore: False
+      ignore: true
       maxchan: false
       subset: ["bioclim"]
       custom: [*bioclim_means, *bioclim_std]

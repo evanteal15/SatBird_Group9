@@ -13,22 +13,9 @@ import warnings
 
 import pandas as pd
 from tqdm import tqdm
-import rich.logging
-import logging
-from logging import getLogger as get_logger
 
-logger = get_logger(__name__)
-logger.setLevel(logging.INFO)
-try:
-    import rich.logging
-
-    # from tqdm.rich import tqdm
-    logger.addHandler(rich.logging.RichHandler(rich_tracebacks=True))
-except ImportError:
-    pass
-
-SCRATCH = Path(os.environ["SCRATCH"])
-SLURM_TMPDIR = Path(os.environ["SLURM_TMPDIR"])
+SCRATCH = Path(os.environ.get("SCRATCH", "/tmp"))
+SLURM_TMPDIR = Path(os.environ.get("SLURM_TMPDIR", "/slurm_tmp"))
 N_CPUS = int(os.environ.get("SLURM_CPUS_ON_NODE", 4))
 
 # -----------------
@@ -37,9 +24,9 @@ N_CPUS = int(os.environ.get("SLURM_CPUS_ON_NODE", 4))
 
 
 def filter_lines(chunk: pd.DataFrame) -> pd.DataFrame:
-    chunk = chunk[chunk["OBSERVATION DATE"].dt.year >= 2010]
+    chunk = chunk[(chunk["OBSERVATION DATE"].dt.year >= 2023)]
     chunk = chunk[chunk["ALL SPECIES REPORTED"] == 1]
-    chunk = chunk[chunk["OBSERVATION DATE"].dt.month.isin([6, 7, 12, 1])]
+    chunk = chunk[chunk["OBSERVATION DATE"].dt.month.isin([6, 7, 8])]
     return chunk
 
 
@@ -62,18 +49,18 @@ def process_hotspot(
     hotspot: Path,
     filler: pd.DataFrame, season = "summer"
 ) -> tuple[dict[str, tuple[dict, pd.DataFrame]], dict[str, tuple[dict, pd.DataFrame]]]:
-    if not os.path.exists(os.path.join("/network/scratch/t/tengmeli/newebd/output/split-" + hotspot[-3:], hotspot+".csv")):
+    if not os.path.exists(os.path.join("./output2/split-" + hotspot[-3:], hotspot+".csv")):
         return {"hotspotnotexist":(0,0)}
-    hotspot_df = pd.read_csv(os.path.join("/network/scratch/t/tengmeli/newebd/output/split-" + hotspot[-3:], hotspot+".csv"), sep ="\t", parse_dates=["OBSERVATION DATE"])
-    #hotspot_name = hotspot_file.stem
-    # Dicts mapping from
+    hotspot_df = pd.read_csv(os.path.join("./output2/split-" + hotspot[-3:], hotspot+".csv"), sep ="\t", parse_dates=["OBSERVATION DATE"])
+    hotspot_df.columns = hotspot_df.columns.str.strip()
+    hotspot_df["OBSERVATION DATE"] = pd.to_datetime(hotspot_df["OBSERVATION DATE"], errors="coerce")
     targets_and_entries: dict[str, tuple[dict, pd.DataFrame]] = {}
     #winter_targets_and_entries: dict[str, tuple[dict, pd.DataFrame]] = {}
 
     if hotspot_df["STATE"].isin(["Hawaii", "Alaska"]).any():
         return {}, {}
     if season=="summer":
-        months = [6,7]
+        months = [6,7,8]
     if season=="winter":
         months = [12,1]
     hotspot_df = hotspot_df[hotspot_df["OBSERVATION DATE"].dt.month.isin(months)]
@@ -111,7 +98,8 @@ def target_and_entry(
 
     def _first_non_nan_value(series: pd.Series) -> pd.Series:
         unique_values = series.unique()
-        assert unique_values.size == 1
+        if unique_values.size != 1:
+            print(unique_values);
         return pd.Series(unique_values[0])
 
     # get dataframes of hotspot info
@@ -138,7 +126,6 @@ def get_filler(data_dir: Path) -> pd.DataFrame:
     if species[-1] == "":
         species = species[:-1]
 
-    assert len(species) == 684
     return pd.DataFrame({"SCIENTIFIC NAME": species})
 
 
@@ -166,20 +153,20 @@ def _remove_dir_if_it_exists(directory: Path, completed_file: Path) -> None:
 def main():
     #choose summer or winter 
     season = "summer"
-    data_dir = Path("/network/scratch/t/tengmeli/newebd/output/") 
+    data_dir = Path("./output2/") 
     # Some very large file csv file (302 Gb)
-    summer_path = Path("/network/projects/ecosystem-embeddings/ebird_new/checklists_USA/summer_list.txt")
-    winter_path = Path("/network/projects/ecosystem-embeddings/ebird_new/checklists_USA/winter_list.txt")
+    summer_path = Path("./checklists_USA/summer_list.csv")
+    winter_path = Path("./checklists_USA/winter_list.csv")
     #or csv file with hotspot ids
     
-    csv_file =  "/network/projects/_groups/ecosystem-embeddings/ebird_dataset_v2/USA_summer/all_summer_hotspots.csv"
+    csv_file =  "./checklists_USA23-25/summer.csv"
 
     #"/network/projects/_groups/ecosystem-embeddings/SatBird_data/extra_summer.csv"
     
     #total_lines = 843_311_790
 
     # Directory where the output files should be created.
-    output_dir = Path("/network/projects/ecosystem-embeddings/SatBird_data_v2/")
+    output_dir = Path("./SatBird_data_23-25/")
 
     # Do NOT allow the output directory to exist, since we want a "clean" preprocessed dataset.
     #output_dir.mkdir(parents=True, exist_ok=True)  # FIXME: Set `exist_ok` to False before posting
@@ -218,14 +205,16 @@ def main():
     targets_dir = output_dir / f"{season}_targets"
     _remove_dir_if_it_exists(targets_dir, targets_dir)
     targets_dir.mkdir(parents=True, exist_ok=False)
-
+    print("Finished creating output dirs")
 
     #with open(summer_path, "r") as f:
     #    data_summer = [line.rstrip().split(",")[0] for line in f]
     #with open(winter_path, "r") as f:
     #    data_winter = [line.rstrip().split(",")[0] for line in f]
-  
-    data  = pd.read_csv(csv_file).hotspot_id.to_list()
+    df = pd.read_csv(csv_file)    
+    df.columns = df.columns.str.strip()
+      
+    data  = df['LOCALITY ID'].to_list()
     print(len(data))
     files_iterator = tqdm(
         data,
@@ -233,7 +222,7 @@ def main():
         unit="Files",
         )
 
-    filler = get_filler(Path("/network/projects/_groups/ecosystem-embeddings/species_splits/"))
+    filler = get_filler(Path("./"))
 
     with mp.Pool(processes=n_processes) as pool:
             # No multiprocessing:
@@ -250,10 +239,9 @@ def main():
                         # Write the target
                     if hotspot_name == "hotspotnotexist":
                         continue
-                    logger.debug(
-                            f"Writing target for  hotspot {hotspot_name}"
-                        )
-                    with open(target_dir / (hotspot_name + ".json"), "x") as f:
+                    if os.path.exists(target_dir / (hotspot_name + ".json")):
+                        continue
+                    with open(target_dir / (hotspot_name + ".json"), "w") as f:
                         json.dump(target, f)
 
                         # Write the entry

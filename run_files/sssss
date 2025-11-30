@@ -1,0 +1,313 @@
+
+--------------------------- /sw/modules/Python/3.10.4 ---------------------------
+   matplotlib/3.5.3    pandas/1.4.2     pytorch/1.12.1
+   mpi4py/3.1.3        poetry/1.6.1     pytorch/2.0.1  (D)
+   numpy/1.22.3        pyarrow/8.0.0    scipy/1.8.0
+
+--------------------- Applications compiled with GCC 10.3.0 ---------------------
+   ITK/5.2.1               impi/2021.5.1               openmpi/4.1.3
+   armadillo/11.4.2        jags/4.3.0                  openmpi/4.1.4
+   boost/1.78.0            jags/4.3.2           (D)    openmpi/4.1.6-cuda
+   fftw-mpi/3.3.10         lapack/3.10.1               openmpi/4.1.6
+   fftw/3.3.10             lapack/3.12.1        (D)    openmpi/5.0.3-cuda
+   gdal/3.5.1              leptonica/1.82.0            openmpi/5.0.3      (D)
+   geos/3.10.2             netcdf-c/4.6.2              pgplot/5.2
+   glpk/5.0                netcdf-c/4.8.1       (D)    pnetcdf/1.13.0
+   groff/1.22.4            netcdf-cxx/4.3.1            proj/9.0.0
+   gsl/2.7                 netcdf-fortran/4.4.5        szip/2.1.1
+   hdf5/1.8.22             openblas/0.3.19             tesseract/5.2.0
+   hdf5/1.10.8      (D)    openblas/0.3.23      (D)
+
+-------------- /sw/spack/arc/modules/linux-rhel8-x86_64/gcc/8.5.0 ---------------
+   mysql/8.0.35
+
+-------------- /sw/spack/arc/modules/linux-rhel8-x86_64/gcc/10.3.0 --------------
+   aspera-cli/3.7.7    libdwarf/20180129    py-azure-cli/2.9.1
+   elfutils/0.188      octave/7.3.0
+
+--------------------- Core applications including compilers ---------------------
+   ANTs/2.4.1
+   ChimeraX/1.7.1
+   EZannot/0.9.8
+   LabGym/2.5.5
+   LabGym/2.8.0                         (D)
+   LabGym/2.9.0
+   LabGym/2.9.6
+   OpenCL/7.0
+   OpenStudio/3.7.0
+   Positron/2025.08.0
+   R/4.2.0
+   R/4.3.1
+   R/4.3.2-mkl
+   R/4.4.0
+   R/4.4.3                              (D)
+   R/4.5.1
+   RStudio/2022.07.1
+   RStudio/2022.07.2
+   RStudio/2023.06.1
+   RStudio/2023.09.1
+   RStudio/2024.04.1
+   RStudio/2025.05.0                    (D)
+   Rgeospatial/4.2.0-2022-08-18
+   Rgeospatial/4.2.0-2023-04-25
+   Rgeospatial/4.3.1-2023-07-01
+   Rgeospatial/4.3.2-mkl-2024-01-15
+   Rgeospatial/4.4.0-2024-05-11
+   Rgeospatial/4.4.3-2025-04-21         (D)
+   Rgeospatial/4.5.1-2025-10-07
+   Rmpi/4.2.0
+   Rmpi/4.3.1
+   Rmpi/4.3.2-mkl
+   Rmpi/4.4.0
+   Rmpi/4.4.3                           (D)
+   Ropenblas/4.2.0
+   Ropenblas/4.3.1
+   Ropenblas/4.4.0
+   Ropenblas/4.4.3                      (D)
+   Ropenblas/4.5.1
+   Rtidyverse/4.2.0
+   Rtidyverse/4.3.1
+   Rtidyverse/4.3.2-mkl
+   Rtidyverse/4.4.0
+   Rtidyverse/4.4.3                     (D)
+   Rtidyverse/4.5.1
+   VTK/9.3.1
+   afni/18.0.27
+   afni/22.2.07                         (D)
+   amesstereopipeline/3.4.0
+   ampl/20220703                        (D)
+   ampl/20250515
+   archivetar/0.15.6
+   archivetar/0.16.0
+   archivetar/0.17.0
+   archivetar/0.17.1
+   archivetar/0.17.2
+   archivetar/0.18.0                    (D)
+   arm-forge/21.1.3
+   aws-cli
+   azcopy/10.28.1
+   binutils/2.45
+   blender/4.0.2
+   cdo/2.0.6
+   cdo/2.4.1                            (D)
+   clang/2022.1.2
+   cmake/3.22.2
+   cmake/3.26.3                         (D)
+   cmake/4.0.3
+   cmtk/3.3.1
+   code-server/4.8.3
+   code-server/4.91.0
+   code-server/4.100.2                  (D)
+   comsol/6.0
+   comsol/6.1
+   comsol/6.2
+   comsol/6.3                           (D)
+   connect-proxy/1.105
+   coq/8.4pl5
+   ctffind/4.1.14
+   cubit/13.2
+   cuda/10.2.89
+   cuda/11.2.2
+   cuda/11.3.0
+   cuda/11.5.1
+   cuda/11.6.2
+   cuda/11.7.1
+   cuda/11.8.0                          ([1;33mL[0m)
+   cuda/12.1.1
+   cuda/12.3.0
+   cuda/12.6.3
+   cuda/12.8.1                          (D)
+   cudnn/10.2-v8.3.1
+   cudnn/11.2-v8.1.1
+   cudnn/11.3-v8.2.1
+   cudnn/11.5-v8.3.1
+   cudnn/11.6-v8.4.1
+   cudnn/11.7-v8.7.0
+   cudnn/11.8-v8.7.0
+   cudnn/12.1-v8.9.0
+   cudnn/12.3-v8.9.6
+   cudnn/12.6-v9.3.0
+   cudnn/12.6-v9.6.0
+   cudnn/12.8-v9.10.0                   (D)
+   cudss/0.7.1
+   cupti/10.2.89
+   cupti/11.2.2
+   cupti/11.3.0
+   cupti/11.5.1
+   cupti/11.6.2
+   cupti/11.7.1
+   cupti/11.8.0
+   cupti/12.1.1
+   cupti/12.3.0
+   cupti/12.6.3
+   cupti/12.8.1                         (D)
+   cytoscape/3.10.2
+   delft3dfm/2021.03
+   delft3dfm/2025                       (D)
+   delft3dfm/142431
+   drgn-ai/1.0.1
+   eigen/3.4.0
+   ffmpeg/4.4.2
+   ffmpeg/5.1.2
+   ffmpeg/6.0.0
+   ffmpeg/7.1.0                         (D)
+   fiji/1.5.3
+   fiji/1.5.4                           (D)
+   fragpipe/22.0
+   freesurfer/6.0.0
+   freesurfer/7.2.0
+   freesurfer/7.4.1                     (D)
+   fsl/6.0.1
+   fsl/6.0.5.2                          (D)
+   gcc/8.2.0
+   gcc/10.3.0                           ([1;33mL[0m)
+   gcc/11.2.0
+   gcc/13.2.0                           (D)
+   gcc/14.1.0
+   gcc/15.1.0
+   gdc-client/1.6.1
+   git-annex/10.20220928
+   git/2.39.1
+   github-cli/2.49.2
+   glib/2.82.5-introspect
+   glib/2.82.5                          (D)
+   globus-cli/3.4.0
+   globus-cli/3.19.0
+   globus-cli/3.29.0
+   globus-cli/3.30.1
+   globus-cli/3.32.0
+   globus-cli/3.33.0
+   globus-cli/3.35.0                    (D)
+   gmt/5.4.3
+   go/1.18
+   go/1.22.2                            (D)
+   gobject-introspection/1.84.0
+   gst-libav/1.16.1
+   gurobi/9.5.1
+   gurobi/10.0.2
+   gurobi/11.0.3                        (D)
+   gurobi/12.0.1
+   idl/9.0
+   ilastik/1.4.0
+   image-libraries/220318
+   imagemagick/7.1.0-25
+   imod/4.12.57
+   intel/2022.1.2
+   jasper/2.0.33
+   jcuda/10.1.0
+   joe/4.6
+   json-glib/1.10.6
+   julia/1.7.2
+   julia/1.8.2
+   julia/1.9.2
+   julia/1.10.2
+   julia/1.11.4                         (D)
+   launcher/3.7
+   lftp/4.9.2
+   libgd/2.3.3
+   libgit2/1.8.4
+   libmount-devel/2.32.1
+   libpng/1.5.30
+   libsodium/1.0.20
+   linaro-forge/23.0.3
+   linaro-forge/24.0.4                  (D)
+   llvm/14.0.6
+   lmod
+   magma/2.25-2
+   magma/2.28-7                         (D)
+   makedepf90/2.8.9
+   mamba/py3.10
+   mamba/py3.11
+   mamba/py3.12                         (D)
+   mamba/py3.13
+   mathematica/13.2.1
+   matlab/R2019a
+   matlab/R2019b
+   matlab/R2021b
+   matlab/R2022b
+   matlab/R2023b
+   matlab/R2024b                        (D)
+   matlab/R2025b
+   mkl/2022.0.2
+   mkl/2023.2.1                         (D)
+   motioncor2/1.4.7
+   mrtrix/3.0.3-dfd3360
+   mrtrix/3.0.4                         (D)
+   mysql/9.3.0                          (D)
+   nasm/2.15.05
+   nbo/7.0
+   nco/4.7.2
+   nco/5.0.6                            (D)
+   ncview/2.1.8
+   ngc-cli/3.54.0
+   node.js/22.14.0
+   nsight-compute/2025.2
+   nsight-systems/2025.3.1
+   nvhpc-openmpi4/22.3
+   nvhpc-openmpi4/24.7                  (D)
+   nvhpc/22.3
+   nvhpc/24.7                           (D)
+   ocaml/4.02.0
+   ocaml/4.14.0                         (D)
+   ollama/0.5.13
+   ollama/0.6.8
+   ollama/0.11.3
+   ollama/0.11.8                        (D)
+   opam/2.1.3
+   openfoam/v2112
+   openfoam/v2212
+   openfoam/v2406                       (D)
+   openfoam/v2412
+   openfoam/10
+   openjdk/18.0.1.1                     (D)
+   openjdk/21.0.1
+   openrefine/3.7.0
+   opensees/3.6.0
+   opensim/4.4.1
+   pandoc/2.17.1.1
+   parabricks/4.0.1-1
+   paraview/5.11.1
+   paraview/5.12.1                      (D)
+   pcre2/10.42
+   python/3.9.12
+   python/3.10.4                        ([1;33mL[0m)
+   python/3.11.5
+   python/3.12.1
+   python/3.13.2                        (D)
+   python3.10-anaconda/2023.03
+   python3.11-anaconda/2024.02
+   python3.9-anaconda/2021.11
+   qt5-devel/5.12.11
+   qt6-devel/6.9.1
+   rclone/1.57.0
+   rclone/1.64.0                        (D)
+   relion-cpu/3.1.3
+   relion-cpu/4.0.0
+   relion-cpu/4.0.2
+   relion-cpu/5.0.0                     (D)
+   relion-gpu/3.1.3
+   relion-gpu/4.0.0
+   relion-gpu/4.0.2
+   relion-gpu/5.0.0                     (D)
+   ruby/3.3.3
+   rust/1.81.0
+   sage/9.6
+   sage/10.4                            (D)
+   sas/9.4-TS1M7                        (D)
+   sas/9.4-TS1M8
+   seissol/201807_Kaikoura-623-g6f221c5
+   settarg
+   shellcheck/0.9.0
+   singularity/4.1.3
+   singularity/4.3.1                    (D)
+   snakemake/7.32.4
+   spack/0.21
+   spack/0.23                           (D)
+   spark/3.2.1
+   spark/3.5.1                          (D)
+   stata-mp/17
+   stata-mp/18
+   stata-mp/19                          (D)
+   stata-se/17
+   stata-se/18
+   stata-se/19   

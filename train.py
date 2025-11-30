@@ -36,6 +36,7 @@ def main(opts):
 
     # naming experiment folders with seed information
     config.save_path = os.path.join(base_dir, config.save_path, str(global_seed))
+    print("Full checkpoint directory path: ", config.save_path)
     config.comet.experiment_name = config.comet.experiment_name + '_seed_' + str(global_seed)
     config.base_dir = base_dir
 

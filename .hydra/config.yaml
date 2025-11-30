@@ -1,0 +1,10 @@
+args:
+  config: configs/SatBird-Michigan-summer/satmae_RGB.yaml
+  base_dir: ''
+  run_id: 1
+  note: null
+  no_comet: false
+  resume: false
+  tags: null
+  dev: false
+auto_lr_find: false

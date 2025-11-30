@@ -12,7 +12,7 @@ import pystac_client
 import planetary_computer
 import argparse
 
-planetary_computer.settings.set_subscription_key("api-key")
+# planetary_computer.settings.set_subscription_key("api-key")
 # This should be a secret!! ask me for mine
 
 # Incase Planetary computer sleeps off,
@@ -28,7 +28,7 @@ catalog = pystac_client.Client.open(
 )
 
 # Define the bands we are interested in --> r,g,b,nir and true color image or "visual"
-BANDS = ["B02", "B03", "B04", "B08"]
+BANDS = ["visual"]
 
 time_of_interest = "2022-06-01/2022-07-31" #this is for summer, if winter use "2022-12-01/2023-01-31"
 
@@ -56,9 +56,10 @@ def convert_polygon(polygon_str):
 
 
 @retry(stop_max_attempt_number=NUM_RETRIES, wait_fixed=WAIT_INTERVAL * 1000)
-def process_row(row, save_dir):
+def process_row(row, save_dir, yr):
     area_of_interest = row["geometry"]
 
+    time_of_interest = f"{yr}-06-01/{yr}-07-31"
     search = catalog.search(
         collections=["sentinel-2-l2a"],
         intersects=area_of_interest,
@@ -181,20 +182,23 @@ def process_row_mosaic(row, save_dir,  cc=20, no_item_found_txt="no_item_found.t
 def main():
     
     # Specify the directory to save the rasters
-    WINTER_SAVE_DIRECTORY = "/network/projects/ecosystem-embeddings/ebird_new/rasters_new/winter_rasters/"
-    SUMMER_SAVE_DIRECTORY = "/network/projects/_groups/ecosystem-embeddings/ebird_new/rasters_new/summer_rasters"
+    WINTER_SAVE_DIRECTORY = "./SatBird_data_v3/rasters_new/winter_rasters/"
+    SUMMER_SAVE_DIRECTORY = "./SatBird_data_v3/summer_rasters22"
 
-    winter_polygons = "/network/projects/ecosystem-embeddings/ebird_new/polygons_winter.csv"
-    summer_polygons = "/network/projects/ecosystem-embeddings/ebird_new/polygons_summer.csv"
+    winter_polygons = "./SatBird_data_v3/polygons_winter.csv"
+    summer_polygons = "./SatBird_data_v3/polygons_summer.csv"
 
     arg_parser = argparse.ArgumentParser(
         prog='DownloadData',
         description='download rasters from planetary compute')
 
     arg_parser.add_argument('-i', '--index', default=1, type=int)
+    arg_parser.add_argument('-y', '--year', default=2025, type=int)
     arg_parser.add_argument('-r', '--range', default=20000, type=int)
     arg_parser.add_argument('-s', '--season', default="summer", type=str)
     args = arg_parser.parse_args()
+    yr = args.year
+    SUMMER_SAVE_DIRECTORY = f"./SatBird_data_v3/summer_rasters{yr}"
 
     index = int(args.index) - 1
     range = int(args.range)
@@ -226,7 +230,7 @@ def main():
     ):
         try:
             #process_row or process_row_mosaic
-            process_row(row, save_dir)
+            process_row(row, save_dir, yr)
         except Exception as e:
             print(f"Error processing row: {e}")
             # Handle the error or raise an exception if desired

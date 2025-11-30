@@ -14,7 +14,7 @@ bioclimatic_raster_names = [
     "bio_18", "bio_19"
 ]
 pedologic_raster_names = [
-    "bdticm", "bldfie", "cecsol", "clyppt", "orcdrc", "phihox", "sltppt", "sndppt"
+    "bldfie", "cecsol", "clyppt", "orcdrc", "phihox", "sltppt", "sndppt"
 ]
 raster_names =bioclimatic_raster_names + pedologic_raster_names
 

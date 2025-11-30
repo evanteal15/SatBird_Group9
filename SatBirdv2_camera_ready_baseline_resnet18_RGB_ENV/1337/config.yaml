@@ -1,0 +1,335 @@
+save_path: /gpfs/accounts/eecs498f25s006_class_root/eecs498f25s006_class/shared_data/SatBird_Group9/SatBirdv2_camera_ready_baseline_resnet18_RGB_ENV/1337
+load_ckpt: ''
+log_comet: true
+save_preds_path: ''
+overfit_debug: false
+overfit_batches: 0.0
+loc:
+  use: false
+  concat: true
+  elev: false
+  num_checklists: false
+  loc_type: latlon
+comet:
+  project_name: camera_ready_neurips_baselines
+  tags:
+  - resnet18
+  - RGB_ENV
+  - corrected_targets
+  - EnvNormalization
+  experiment_name: SatBirdv2_camera_ready_baseline_resnet18_RGB_ENV_seed_1337
+  experiment_key: ''
+experiment:
+  task: ebird_classifier
+  name: ebird_classifier
+  seed: 42
+  module:
+    model: resnet18
+    pretrained: true
+    transfer_weights: ''
+    init_bias: ''
+    means_path: ''
+    lr: 0.0001
+    resume: ''
+    freeze: false
+    use_weighted_loss: false
+    loss_weight: log
+    fc: linear
+optimizer: Adam
+scheduler:
+  name: ReduceLROnPlateau
+  reduce_lr_plateau:
+    factor: 0.5
+    lr_schedule_patience: 20
+  step_lr:
+    step_size: 100
+    gamma: 0.5
+  warmup:
+    warmup_epochs: 5
+    max_epochs: 100
+  cyclical:
+    warmup_epochs: 10
+variables:
+  ped_means:
+  - 2117.495849609375
+  - 1294.1939697265625
+  - 18.906713485717773
+  - 17.45955467224121
+  - 27.276792526245117
+  - 58.40444564819336
+  - 35.62682342529297
+  - 40.515846252441406
+  ped_std:
+  - 3083.57080078125
+  - 306.7949523925781
+  - 11.93885326385498
+  - 8.527831077575684
+  - 27.833993911743164
+  - 10.95920467376709
+  - 13.536788940429688
+  - 16.769182205200195
+  bioclim_means:
+  - 10.191352844238281
+  - 11.747689247131348
+  - 35.098602294921875
+  - 798.8275146484375
+  - 27.425537109375
+  - -6.044749736785889
+  - 33.466548919677734
+  - 14.104681968688965
+  - 5.837212562561035
+  - 19.897106170654297
+  - 0.2229340374469757
+  - 880.8309326171875
+  - 109.87236022949219
+  - 41.305816650390625
+  - 33.404544830322266
+  - 303.9446105957031
+  - 142.48114013671875
+  - 223.2350311279297
+  - 213.5035858154297
+  bioclim_std:
+  - 4.929360866546631
+  - 3.259413719177246
+  - 8.394328117370605
+  - 265.825927734375
+  - 6.9770073890686035
+  - 6.530070781707764
+  - 9.361323356628418
+  - 8.514286041259766
+  - 10.54300308227539
+  - 5.78766393661499
+  - 6.0771870613098145
+  - 399.3084716796875
+  - 53.35330581665039
+  - 29.239219665527344
+  - 23.821237564086914
+  - 150.35696411132812
+  - 94.13204193115234
+  - 122.69672393798828
+  - 156.7698211669922
+  rgbnir_means: []
+  rgbnir_std: []
+  visual_means:
+  - 79.57199696558256
+  - 85.5200354975726
+  - 61.23282048515887
+  visual_stds:
+  - 64.14066838805365
+  - 49.64127938279932
+  - 47.55280477391272
+data:
+  loaders:
+    num_workers: 8
+    batch_size: 128
+  datatype: img
+  bands:
+  - rgb
+  res: 10
+  env:
+  - bioclim
+  - ped
+  env_var_sizes:
+  - 19
+  - 8
+  multiscale:
+  - 64
+  multiscale_bands:
+  - landuse
+  - sats
+  multiscale_agg: features
+  ped:
+    res: 250
+  bioclim:
+    res: 1000
+  files:
+    base: USA_summer_michigan
+    train: train_split.csv
+    val: valid_split.csv
+    test: test_split.csv
+    targets_folder: targets
+    env_data_folder: environmental
+    images_folder: images
+    correction_thresh: range_maps.pkl
+    rgbnir_means: stats/means_rgbnir.npy
+    rgbnir_stds: stats/stds_rgbnir.npy
+    rgb_means: stats/means_images_visual.npy
+    rgb_stds: stats/stds_images_visual.npy
+    env_means: stats/env_means.npy
+    env_stds: stats/env_stds.npy
+  correction_factor:
+    thresh: null
+  target:
+    type: probs
+    subset: null
+  transforms:
+  - name: matchres
+    ignore: false
+    subset:
+    - bioclim
+    - ped
+    target_size:
+    - 64
+    - 64
+    custom_means:
+    - []
+    - []
+  - name: crop
+    ignore: false
+    p: 1
+    ignore_band:
+    - bioclim
+    - ped
+    center: true
+    height: 64
+    width: 64
+  - name: hflip
+    ignore: val
+    p: 0.5
+  - name: vflip
+    ignore: val
+    p: 0.5
+  - name: normalize
+    normalize_by_255: false
+    ignore: false
+    maxchan: false
+    subset:
+    - sat
+    custom:
+    - []
+    - []
+  - name: normalize
+    normalize_by_255: false
+    ignore: false
+    maxchan: false
+    subset:
+    - bioclim
+    custom:
+    - []
+    - []
+  - name: normalize
+    normalize_by_255: false
+    ignore: false
+    maxchan: false
+    subset:
+    - ped
+    custom:
+    - []
+    - []
+  - name: randomnoise
+    ignore: val
+    std: 0.01
+    max_noise: 0.05
+    p: 0.35
+  - name: blur
+    ignore: val
+    p: 0.5
+    val: 0.1
+  - name: rotate
+    ignore: val
+    p: 0.5
+    val: 15
+  - name: randomcontrast
+    ignore: val
+    p: 0.35
+    val: 2
+  - name: randombrightness
+    ignore: val
+    p: 0.3
+    val: 2
+  species: []
+  total_species: 670
+program:
+  seed: 1337
+  output_dir: output
+  data_dir: data
+  log_dir: logs
+  overwrite: false
+losses:
+  criterion: CE
+  ce:
+    ignore: false
+    lambd_pres: 1
+    lambd_abs: 1
+  metrics:
+  - name: ce
+    ignore: true
+    lambd_pres: 1
+    lambd_abs: 1
+    scale: 1
+  - name: mae
+    ignore: false
+    scale: 10
+  - name: mse
+    ignore: false
+    scale: 10
+  - name: topk
+    ignore: false
+    scale: 1
+  - name: r2
+    ignore: true
+    scale: 1
+  - name: kl
+    ignore: false
+    scale: 1
+  - name: accuracy
+    ignore: true
+    scale: 1
+  - name: top10
+    ignore: false
+    scale: 1
+  - name: top30
+    ignore: false
+    scale: 1
+trainer:
+  logger: true
+  checkpoint_callback: true
+  callbacks: null
+  default_root_dir: null
+  gradient_clip_val: 0.0
+  process_position: 0
+  num_nodes: 1
+  num_processes: 1
+  gpus: 1
+  auto_select_gpus: false
+  tpu_cores: null
+  log_gpu_memory: null
+  progress_bar_refresh_rate: null
+  overfit_batches: 0.0
+  track_grad_norm: -1
+  check_val_every_n_epoch: 1
+  fast_dev_run: false
+  accumulate_grad_batches: 1
+  max_epochs: 400
+  min_epochs: null
+  max_steps: null
+  min_steps: null
+  limit_train_batches: 1.0
+  limit_val_batches: 1.0
+  limit_test_batches: 1.0
+  val_check_interval: 1.0
+  flush_logs_every_n_steps: 100
+  log_every_n_steps: 1
+  accelerator: null
+  sync_batchnorm: false
+  precision: 32
+  weights_summary: top
+  weights_save_path: null
+  num_sanity_val_steps: 2
+  resume_from_checkpoint: null
+  profiler: null
+  benchmark: false
+  deterministic: false
+  reload_dataloaders_every_epoch: false
+  auto_lr_find: false
+  replace_sampler_ddp: true
+  terminate_on_nan: false
+  auto_scale_batch_size: false
+  prepare_data_per_node: true
+  plugins: null
+  amp_backend: native
+  move_metrics_to_cpu: false
+load_ckpt_path: SatBirdv2_camera_ready_baseline_resnet18_RGB_ENV
+max_epochs: 50
+base_dir: /gpfs/accounts/eecs498f25s006_class_root/eecs498f25s006_class/shared_data/SatBird_Group9
+auto_lr_find: false

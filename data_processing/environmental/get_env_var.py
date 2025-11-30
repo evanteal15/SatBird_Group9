@@ -2,33 +2,43 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path().resolve().parent))
-sys.path.append(str(Path().resolve().parent.parent))
+#sys.path.append(str(Path().resolve().parent))
+#sys.path.append(str(Path().resolve().parent.parent))
 import numpy as np
 import pandas as pd
 
+# Get the current script's directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Get the parent of the parent directory (SatBird_Group9)
+root_dir = os.path.abspath(os.path.join(current_dir, '../../'))
+
+# Add to Python path
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+
 from data_processing.environmental.environmental_raster import PatchExtractor
 
-DATA_PATH = Path("/network/scratch/t/tengmeli/geolifeclef-2022/rasters")
+DATA_PATH = Path("./static_rasters/")
 
 extractor = PatchExtractor(DATA_PATH, country="USA", size = 50)
 extractor.add_all_rasters()
 print("Number of rasters: {}".format(len(extractor)))
 
 if __name__=="__main__":
-    df = pd.read_csv("/network/projects/ecosystem-embeddings/SatBird_data_v2/USA_winter/winter_hotspots.csv") #"hotspots_data_with_bioclim.csv")
+    df = pd.read_csv("./SatBird_data_complete/all_hotspots_cleaned.csv") #"hotspots_data_with_bioclim.csv")
     for index, row in df.iterrows():
         i = 0
         if index % 100 == 0:
             print(index)
         try : 
             val = extractor[row.lat, row.lon]
-            np.save("/network/projects/ecosystem-embeddings/SatBird_data_v2/USA_winter/environmental/" + row.hotspot_id + ".npy", val)
+            np.save("./SatBird_data_complete/environmental2/" + row.hotspot_id + ".npy", val)
         except :
             i+= 1
         #try:
         #    val = extrator2[row.lat, row.lon]
          #   np.save("/network/scratch/t/tengmeli/scratch/ecosystem-embedding/hotspot_env_var/" + row.hotspot_id + ".npy", val)
-        #except : 
+        #except :
+            print("Bad Hotspot") 
             print(row.hotspot_id, row.index) #, row['Unnamed: 0'])
             pass

@@ -11,3 +11,23 @@ checkpoints*
 new_kenya2/*
 USA_summer.tar.gz
 Kenya-001.zip
+SatBird_data*
+*.npy
+*.tif
+USA*
+lightning_logs/
+output*
+*.out
+*.log
+*.save*
+*.txt
+pretrained_weights/
+wc*
+checklist*
+EBD/
+
+# Ignore environment files
+satbird_env/
+
+# Ignore logs from slurm jobs on Grat Lakes
+logs/
