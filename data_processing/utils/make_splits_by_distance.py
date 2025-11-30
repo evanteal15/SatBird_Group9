@@ -132,7 +132,7 @@ if __name__ == "__main__":
     random.seed(0)
     # Reading Hotspot data
 
-    locs = pd.read_csv("/network/projects/ecosystem-embeddings/ebird_new/summer_hotspots_clean.csv")
+    locs = pd.read_csv("SatBird_data_complete/all_hotspots_cleaned2.csv")
     print(len(locs))
     #pd.read_csv('/network/projects/_groups/ecosystem-embeddings/hotspot_split_june/hotspots_june_filtered.csv')
     locs = locs.sort_values("county_code").reset_index()
@@ -160,14 +160,14 @@ if __name__ == "__main__":
     # Write to text files
     for name in splits_names:
         lats_lons = locs.loc[splits[name], 'hotspot_id']
-        write_array_text(lats_lons,
-                         f"/network/scratch/t/tengmeli/scratch/ecosystem-embedding/training/new_{name}_clustered_summer_5.txt")
+        file_name = f"SatBird_data_complete/new_{name}_clustered_summer_5.txt"
+        write_array_text(lats_lons, file_name)
 
     # Write to csv files:
     df = locs
     df["split"] = ""
     for name in splits_names:
         df.loc[splits[name], "split"] = name #.reset_index(drop=True)
-    df.to_csv(f'/network/scratch/t/tengmeli/scratch/ecosystem-embedding/training/satbird_clustered_summer.csv')
+    df.to_csv(f'SatBird_data_complete/training/satbird_clustered_summer.csv')
 
     # print(df.head())

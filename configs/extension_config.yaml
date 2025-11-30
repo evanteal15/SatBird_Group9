@@ -22,6 +22,8 @@ program: # These are the arguments that define how the train.py script works
   log_dir: logs
   overwrite: False
 
+split: "cluster"
+
 data:
   loaders:
     num_workers: 4

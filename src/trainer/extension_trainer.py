@@ -40,9 +40,15 @@ class EbirdDataModule(pl.LightningDataModule):
         self.batch_size = self.opts.data.loaders.batch_size
         self.num_workers = self.opts.data.loaders.num_workers
         self.data_base_dir = self.opts.data.files.base
-        self.df_train = pd.read_csv(os.path.join(self.data_base_dir, self.opts.data.files.train))
-        self.df_val = pd.read_csv(os.path.join(self.data_base_dir, self.opts.data.files.val))
-        self.df_test = pd.read_csv(os.path.join(self.data_base_dir, self.opts.data.files.test))
+        if self.opts.split == "cluster":
+            df = pd.read_csv("SatBird_data_complete/training/satbird_clustered_summer.csv")
+            self.df_train = df[df['split'] == 'train']
+            self.df_val  = df[df['split'] == 'valid']
+            self.df_test = df[df['split'] == 'test']
+        else:
+            self.df_train = pd.read_csv(os.path.join(self.data_base_dir, self.opts.data.files.train))
+            self.df_val = pd.read_csv(os.path.join(self.data_base_dir, self.opts.data.files.val))
+            self.df_test = pd.read_csv(os.path.join(self.data_base_dir, self.opts.data.files.test))
         self.num_species = self.opts.data.total_species
         self.setup()
 
