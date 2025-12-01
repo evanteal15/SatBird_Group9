@@ -89,32 +89,40 @@ class MultimodalEnsemble(pl.LightningModule):
         # Input: [B, 2, 3, 448, 448] 
         # we separate by year and process them separately to try and get timeseries dependent
         # ----------------------------
-        self.temporal = "transformer"
-        self.landsat_model = models.resnet18()
-        self.landsat_model.conv1 = nn.Conv2d(
-            in_channels=3,
-            out_channels=64,
-            kernel_size=7,
-            stride=2,
-            padding=3,
-            bias=False,
-        )
-        self.landsat_model.maxpool = nn.Identity() # should remove these?
-        self.landsat_model.fc = nn.Identity() # should remove these?
-        self.landsat_model.to(device)
-        self.landsat_out = 512
-        
-        # Temporal model
-        if self.temporal == "transformer":
-            encoder_layer = nn.TransformerEncoderLayer(
-                d_model=self.landsat_out, nhead=8, batch_first=True
+        self.resnet = True
+        self.temporal = None
+        if not self.resnet:
+            self.temporal = "transformer"
+            self.landsat_model = models.resnet18()
+            self.landsat_model.conv1 = nn.Conv2d(
+                in_channels=3,
+                out_channels=64,
+                kernel_size=7,
+                stride=2,
+                padding=3,
+                bias=False,
             )
-            self.temporal_model = nn.TransformerEncoder(encoder_layer, num_layers=2)
-            self.temporal_model.to(device)
-        elif self.temporal == "gru":
-            self.temporal_model = nn.GRU(self.landsat_out, self.landsat_out, batch_first=True)
+            self.landsat_model.maxpool = nn.Identity() # should remove these?
+            self.landsat_model.fc = nn.Identity() # should remove these?
+            self.landsat_model.to(device)
+            
+            # Temporal model
+            if self.temporal == "transformer":
+                encoder_layer = nn.TransformerEncoderLayer(
+                    d_model=self.landsat_out, nhead=8, batch_first=True
+                )
+                self.temporal_model = nn.TransformerEncoder(encoder_layer, num_layers=2)
+                self.temporal_model.to(device)
+            elif self.temporal == "gru":
+                self.temporal_model = nn.GRU(self.landsat_out, self.landsat_out, batch_first=True)
+            else:
+                self.temporal_model = nn.Identity()
         else:
-            self.temporal_model = nn.Identity()
+            self.landsat_model = models.resnet18()
+            self.landsat_model.fc = nn.Linear(512, 512)
+            self.landsat_model.to(device)
+
+        self.landsat_out = 512
 
         # ----------------------------
         # Bioclim branch
@@ -182,17 +190,17 @@ class MultimodalEnsemble(pl.LightningModule):
         landsat_dat = landsat.view(B*T, C, H, W)
         feats = self.landsat_model(landsat_dat) # CNN for each timestep [B*T, 512]
         
-        # reshape back to time series [B, T, 512]
-        feats = feats.view(B, T, self.landsat_out)
 
         # apply temporal model
-        if isinstance(self.temporal_model, nn.GRU):
-            feats, _ = self.temporal_model(feats)   # [B, T, 512]
-        else:
-            feats = self.temporal_model(feats)      # transformer
-
-        landsat_feat = feats.mean(dim=1) # better for small sequences
-
+        if self.temporal:
+            # reshape back to time series [B, T, 512]
+            feats = feats.view(B, T, self.landsat_out)
+            if isinstance(self.temporal_model, nn.GRU):
+                feats, _ = self.temporal_model(feats)   # [B, T, 512]
+            else:
+                feats = self.temporal_model(feats)      # transformer
+        landsat_feat = feats.view(B, T, self.landsat_out).squeeze(1)
+        landsat_feat = landsat_feat.mean(dim=1)
         # bioclim: [B, 1, 27, 50, 50]
         bioclim_feat = self.bioclim_model(bioclim)
 
@@ -345,7 +353,7 @@ def main(opts):
             "num_complete_checklists": num_complete_checklists,
     """
 
-    retrain = False
+    retrain = True
     if retrain:
         print(f"Training for {num_epochs} epochs started.")
         for epoch in range(num_epochs):
