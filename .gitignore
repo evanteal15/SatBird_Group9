@@ -11,6 +11,7 @@ checkpoints*
 new_kenya2/*
 USA_summer.tar.gz
 Kenya-001.zip
+<<<<<<< HEAD
 SatBird_data*
 *.npy
 *.tif

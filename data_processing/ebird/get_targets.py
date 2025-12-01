@@ -213,7 +213,6 @@ def main():
     #    data_winter = [line.rstrip().split(",")[0] for line in f]
     df = pd.read_csv(csv_file)    
     df.columns = df.columns.str.strip()
-      
     data  = df['LOCALITY ID'].to_list()
     print(len(data))
     files_iterator = tqdm(

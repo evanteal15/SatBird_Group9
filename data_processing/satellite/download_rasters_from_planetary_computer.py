@@ -13,6 +13,7 @@ import planetary_computer
 import argparse
 
 # planetary_computer.settings.set_subscription_key("api-key")
+
 # This should be a secret!! ask me for mine
 
 # Incase Planetary computer sleeps off,
@@ -29,6 +30,8 @@ catalog = pystac_client.Client.open(
 
 # Define the bands we are interested in --> r,g,b,nir and true color image or "visual"
 BANDS = ["visual"]
+# BANDS = ["B02", "B03", "B04", "B08"]
+
 
 time_of_interest = "2022-06-01/2022-07-31" #this is for summer, if winter use "2022-12-01/2023-01-31"
 

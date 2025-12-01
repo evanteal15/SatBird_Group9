@@ -19,7 +19,10 @@ dependencies:
   - tzdata=2023c=h04d1e81_0
   - xz=5.2.5=h7f8727e_1
   - zlib=1.2.12=h7f8727e_2
+<<<<<<< HEAD
   - pip<24.1
+=======
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
   - pip:
     - absl-py==2.0.0
     - addict==2.4.0
@@ -72,7 +75,11 @@ dependencies:
     - oauthlib==3.2.2
     - omegaconf==2.3.0
     - packaging==23.2
+<<<<<<< HEAD
     - pandas==1.5.3
+=======
+    - pandas==1.1.5
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
     - pillow==9.3.0
     - pip==23.3
     - protobuf==4.23.4

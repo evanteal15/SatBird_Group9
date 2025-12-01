@@ -4,6 +4,7 @@ save_path: "checkpoints"
 # load existing checkpoint for inference. If passing experiment folder instead (for multiple seeds), it will evaluate all of them.
 load_ckpt_path: ""
 save_preds_path: ""
+
 log_comet: false
 
 overfit_batches: 0.0
@@ -98,7 +99,7 @@ data:
       res: 1000
 
   files:
-    base: "new_kenya2"
+    base: "USA_summer"
     train: "train_split.csv"
     val: "valid_split.csv"
     test: "test_split.csv"
@@ -130,6 +131,7 @@ data:
   transforms:
     - name: matchres
       ignore: true
+      ignore: false
       subset: ["bioclim", "ped"]
       target_size: [64, 64]
       custom_means: [*bioclim_means, *ped_means]
@@ -156,7 +158,7 @@ data:
 
     - name: normalize
       normalize_by_255: False
-      ignore: true
+      ignore: False
       maxchan: false
       subset: ["bioclim"]
       custom: [*bioclim_means, *bioclim_std]

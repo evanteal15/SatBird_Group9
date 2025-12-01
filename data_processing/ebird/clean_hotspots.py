@@ -5,6 +5,7 @@ from pathlib import Path
 import os, numpy, json, tifffile
 
 def filter_by_sat():
+
     summer = pd.read_csv("./SatBird_data_complete/all_hotspots_syncd.csv")
     hotspots = [r.strip(".tif") for r in os.listdir("./SatBird_data_v3/summer_rasters2022/")]
     hotspots1 = [r.strip(".tif") for r in os.listdir("./SatBird_data_v3/summer_rasters2023/")]
@@ -45,3 +46,4 @@ if __name__=="__main__":
     filter_by_sat()
     #filter_by_geography()
     #filter_by_size()
+

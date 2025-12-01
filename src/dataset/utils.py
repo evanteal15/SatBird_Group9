@@ -54,13 +54,22 @@ def is_image_file(filename):
 
 def load_geotiff_visual(file):
     img = tiff.imread(file).astype(np.float32)
+<<<<<<< HEAD
     img = np.reshape(img, (img.shape[2], img.shape[0], img.shape[1]))
+=======
+
+    img = np.reshape(img, (img.shape[2], img.shape[0], img.shape[1]))
+
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
     return img
 
 
 def load_geotiff(file):
     img = tiff.imread(file)
+<<<<<<< HEAD
     print(img.shape)
+=======
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
     new_band_order = [2, 1, 0, 3]  # r, g, b, nir
     img = img[:, :, new_band_order].astype(float)
     img = np.reshape(img, (img.shape[2], img.shape[0], img.shape[1]))

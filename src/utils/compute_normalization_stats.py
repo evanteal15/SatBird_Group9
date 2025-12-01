@@ -34,7 +34,11 @@ def compute_means_stds_images(root_dir, train_csv, output_file_means="stats/mean
             cropped = crop_center(arr, 64, 64)
             means = np.mean(np.mean(cropped, axis=0), axis=0)
             new_row = {'hotspot_id': hs, 'r': means[2], 'g': means[1], 'b': means[0], 'nir': means[3]}
+<<<<<<< HEAD
             stats_df = pd.concat([stats_df, pd.DataFrame([new_row])], ignore_index=True)
+=======
+            stats_df = stats_df.append(new_row, ignore_index=True)
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
 
         mean_r = stats_df["r"].mean()
         mean_g = stats_df["g"].mean()
@@ -57,7 +61,11 @@ def compute_means_stds_images(root_dir, train_csv, output_file_means="stats/mean
             cropped = crop_center(arr, 64, 64)
             std = ((cropped - means) ** 2 / (64 * 64)).sum(axis=0).sum(axis=0)
             new_row = {'hotspot_id': hs, 'r_std': std[2], 'g_std': std[1], 'b_std': std[0], 'nir_std': std[3]}
+<<<<<<< HEAD
             stats_df_2 = pd.concat([stats_df_2, pd.DataFrame([new_row])], ignore_index=True)
+=======
+            stats_df_2 = stats_df_2.append(new_row, ignore_index=True)
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
         std_r = np.sqrt(stats_df_2["r_std"].mean())
         std_g = np.sqrt(stats_df_2["g_std"].mean())
         std_b = np.sqrt(stats_df_2["b_std"].mean())
@@ -88,7 +96,11 @@ def compute_means_stds_images_visual(root_dir, train_csv, output_file_means="sta
             cropped = crop_center(arr, 64, 64)
             means = np.mean(np.mean(cropped, axis=0), axis=0)
             new_row = {'hotspot_id': hs, 'r': means[0], 'g': means[1], 'b': means[2]}
+<<<<<<< HEAD
             stats_df = pd.concat([stats_df, pd.DataFrame([new_row])], ignore_index=True)
+=======
+            stats_df = stats_df.append(new_row, ignore_index=True)
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
 
         mean_r = stats_df["r"].mean()
         mean_g = stats_df["g"].mean()
@@ -108,7 +120,11 @@ def compute_means_stds_images_visual(root_dir, train_csv, output_file_means="sta
             cropped = crop_center(arr, 64, 64)
             std = ((cropped - means) ** 2 / (64 * 64)).sum(axis=0).sum(axis=0)
             new_row = {'hotspot_id': hs, 'r_std': std[0], 'g_std': std[1], 'b_std': std[2]}
+<<<<<<< HEAD
             stats_df_2 = pd.concat([stats_df_2, pd.DataFrame([new_row])], ignore_index=True)
+=======
+            stats_df_2 = stats_df_2.append(new_row, ignore_index=True)
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
 
         std_r = np.sqrt(stats_df_2["r_std"].mean())
         std_g = np.sqrt(stats_df_2["g_std"].mean())
@@ -166,7 +182,11 @@ def compute_means_stds_env_vars(root_dir, train_csv, env, env_data_folder="envir
             arr = np.load(os.path.join(root_dir, env_data_folder, f"{hs}.npy"))
             per_raster_mean = np.nanmean(arr, axis=(1, 2))
             new_row = pd.Series(per_raster_mean, index=stats_df.columns)
+<<<<<<< HEAD
             stats_df = pd.concat([stats_df, new_row.to_frame().T], ignore_index=True)
+=======
+            stats_df = stats_df.append(new_row, ignore_index=True)
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
 
         means_to_save = []
         for env_var in env_var_names:
@@ -188,7 +208,11 @@ def compute_means_stds_env_vars(root_dir, train_csv, env, env_data_folder="envir
             std = np.nansum(((arr - means[:, np.newaxis, np.newaxis]) ** 2) / (50 * 50), axis=-1)
             std = np.nansum(std, axis=-1)
             new_row = pd.Series(std, index=stats_df.columns)
+<<<<<<< HEAD
             stats_df = pd.concat([stats_df, new_row.to_frame().T], ignore_index=True)
+=======
+            stats_df = stats_df.append(new_row, ignore_index=True)
+>>>>>>> 2d7f3f4eea6d78e687bb9e2d4d34df1ce909b76d
         stds_to_save = []
         for env_var in env_var_names:
             stds_to_save.append(np.sqrt((stats_df[env_var]).mean()))
